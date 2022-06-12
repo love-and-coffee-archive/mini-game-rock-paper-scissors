@@ -2,7 +2,7 @@
 	"name": "rock-paper-scissors",
 	"version": "0.0.1",
 	"description": "",
-	"private": true,
+	"private": false,
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
@@ -11,11 +11,11 @@
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "node node_modules/@smiletime/mini-game-sdk/dist/minigameBuildScript.js",
+		"build": "node node_modules/@love-and-coffee/mini-game-sdk/dist/minigameBuildScript.js",
 		"dev": "webpack serve --open"
 	},
 	"devDependencies": {
-		"@smiletime/mini-game-sdk": "^0.0.14",
+		"@love-and-coffee/mini-game-sdk": "^0.0.15",
 		"css-loader": "^6.7.1",
 		"html-loader": "^3.0.1",
 		"html-webpack-plugin": "^5.5.0",
