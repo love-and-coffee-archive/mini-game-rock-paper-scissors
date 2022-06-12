@@ -1,4 +1,4 @@
-import { Client } from '@smiletime/mini-game-sdk';
+import { Client } from '@love-and-coffee/mini-game-sdk';
 import './index.scss';
 import mainMenuHTML from './main-menu.html';
 import matchmakingHTML from './matchmaking.html';

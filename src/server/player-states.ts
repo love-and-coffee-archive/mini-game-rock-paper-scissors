@@ -1,4 +1,4 @@
-import { Server, User } from '@smiletime/mini-game-sdk';
+import { Server, User } from '@love-and-coffee/mini-game-sdk';
 
 type Phase = 'main-menu' | 'matchmaking' | 'battle' | 'results';
 type Result = 'won' | 'lost' | 'tie';

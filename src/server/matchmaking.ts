@@ -1,4 +1,4 @@
-import { Server, User } from '@smiletime/mini-game-sdk';
+import { Server, User } from '@love-and-coffee/mini-game-sdk';
 import { movePlayerToMatchmaking, playerStates } from './player-states';
 
 let gameServer: Server;

@@ -1,4 +1,4 @@
-import { initTestEnvironment } from '@smiletime/mini-game-sdk';
+import { initTestEnvironment } from '@love-and-coffee/mini-game-sdk';
 import { initClient } from './client';
 import { initServer } from './server';
 

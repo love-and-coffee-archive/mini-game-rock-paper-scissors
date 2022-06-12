@@ -1,4 +1,4 @@
-import { Server, User } from '@smiletime/mini-game-sdk';
+import { Server, User } from '@love-and-coffee/mini-game-sdk';
 import { randomIntFromInterval } from './helpers';
 import { initMatchmaker, startMatching } from './matchmaking';
 import { initPlayerStates, movePlayerToBattle, movePlayerToMainMenu, movePlayerToResults } from './player-states';
