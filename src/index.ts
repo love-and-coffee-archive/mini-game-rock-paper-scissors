@@ -11,9 +11,6 @@ initTestEnvironment(
 		gameTag: pjson.name,
 		clientSizes: [
 			"s",
-			"m",
-			"l",
-			"400x400"
 		],
 	}
 );

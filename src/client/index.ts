@@ -1,51 +1,70 @@
 import { Client } from '@smiletime/mini-game-sdk';
 import './index.scss';
-import html from './index.html';
+import mainMenuHTML from './main-menu.html';
+import matchmakingHTML from './matchmaking.html';
+import battleHTML from './battle.html';
+import resultsHTML from './results.html';
 
 export async function initClient(gameContainer: HTMLElement, client: Client) {
-	let totalTaps = 0;
-	let yourTaps = 0;
+	let phase: string | null = null;
+	let timerElement: HTMLElement;
 
-	let totalTapContainer: HTMLElement;
-	let yourTapContainer: HTMLElement;
-	let tapArea: HTMLElement;
+	// TODO: Split logic in smaller functions
+	function renderState(state: any) {
+		phase = state.phase;
 
-	// Render game state from server together with local changes that haven't been delivered to server yet
-	function renderTaps() {
-		totalTapContainer.innerText = totalTaps.toLocaleString();
-		yourTapContainer.innerText = yourTaps.toLocaleString();
-	}
+		if (state.phase === 'main-menu') {
+			// TODO: Make this screen look nice
+			gameContainer.innerHTML = mainMenuHTML;
+			
+			gameContainer.querySelector('button').onclick = () => {
+				client.call('start-matchmaking');
+			}
+		} else if (state.phase === 'matchmaking') {
+			// TODO: Make this screen look nice
+			gameContainer.innerHTML = matchmakingHTML;
+		} else if (state.phase === 'battle') {
+			// TODO: Make this screen look nice
+			gameContainer.innerHTML = battleHTML;
 
-	// Add game html and acquire references to key game elements
-	gameContainer.innerHTML += html;
+			const opponent = client.getUsers()[state.opponent];
+			
+			const opponentElement = gameContainer.querySelector('.opponent');
+			opponentElement.textContent = opponent.name;
+			
+			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
+			opponentAvatarElement.src = opponent.getAvatarUrl(32);
+			
+			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
+			yourAvatarElement.src = client.user.getAvatarUrl(32);
 
-	totalTapContainer = gameContainer.querySelector('.total-taps');
-	yourTapContainer = gameContainer.querySelector('.your-taps');
-	tapArea = gameContainer.querySelector('.game');
+			// TODO: Add ability to select user action and display its state
 
-	tapArea.onclick = async (e) => {
-		yourTaps += 1;
-		totalTaps += 1;
-
-		client.call('tap');
-
-		renderTaps();
-	};
-
-	// Update total tap value when server game state updates
-	const clearSetDataListener = client.emitter.on('setData', (key: string, value: any) => {
-		if (key === 'total-taps') {
-			totalTaps = value;
-
-			renderTaps();
+			timerElement = gameContainer.querySelector('.timer');
+		} else if (state.phase === 'results') {
+			// TODO: Make this screen look nice
+			gameContainer.innerHTML = resultsHTML;
+			
+			const resultElement = gameContainer.querySelector('.result');
+			resultElement.textContent = state.result;
+		} else {
+			gameContainer.innerHTML = JSON.stringify(state);
 		}
+	}
+	
+	const clearSetDataListener = client.emitter.on('setData', (key: string, value: any) => {
+		if (key === 'state') {
+			renderState(value);
+		}
+
+		if (key === 'remaining-time' && phase === 'battle' && timerElement) {
+			timerElement.textContent = value;
+		}
+
+		// TODO: Display selected action based on 'selected-action' key 
 	});
 
-	// Get current game state from server
-	totalTaps = client.getData('total-taps') ?? 0;
-	yourTaps = client.getData('your-taps') ?? 0;
-
-	renderTaps();
+	renderState(client.getData('state'));
 
 	// Minigame destroy function
 	return () => {

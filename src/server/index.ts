@@ -1,26 +1,78 @@
-import { Server } from '@smiletime/mini-game-sdk';
+import { Server, User } from '@smiletime/mini-game-sdk';
+import { randomIntFromInterval } from './helpers';
+import { initMatchmaker, startMatching } from './matchmaking';
+import { initPlayerStates, movePlayerToBattle, movePlayerToMainMenu, movePlayerToResults } from './player-states';
 
-let totalTaps = 0;
-let callerTaps: { [key: string]: number } = {};
+let gameServer: Server;
 
-export function initServer(server: Server) {
-	// Register function 'tap' that can be called by clients
-	server.register('tap', (caller) => {
-		// Locally update total amount of taps taken place
-		totalTaps += 1;
-		server.setData('total-taps', totalTaps);
+const matchDuration = 10;
+type Action = 'rock' | 'paper' | 'scissors' | null;
 
-		if (callerTaps[caller.id] == null) {
-			callerTaps[caller.id] = 0;
+const playerSelectedAction: { [key: string]: Action } = {}; 
+
+function setRemainingTime(player: User, seconds: number) {
+	gameServer.setPrivateData(player.id, 'remaining-time', seconds);
+}
+
+function pickAction(user: User, action: Action) {
+	playerSelectedAction[user.id] = action;
+	gameServer.setPrivateData(user.id, 'selected-action', action);
+}
+
+function finalizeResults(players: User[]) {
+	// TODO: determine who won based on playerSelectedAction and increment their score
+	// TODO: if player hasn't picked an action then pick a random one for them
+	const playerWhoWon = players[randomIntFromInterval(0, players.length - 1)];
+	gameServer.setScore(playerWhoWon.id, gameServer.getScore(playerWhoWon.id) + 1);
+
+	movePlayerToResults(players[0], players[1], playerWhoWon.id === players[0].id ? 'won' : 'lost');
+	movePlayerToResults(players[1], players[0], playerWhoWon.id === players[1].id ? 'won' : 'lost');
+
+	// TODO: Do another round if players had a tie
+
+	// Short delay to show vistory/loss animation before we reset player states
+	setTimeout(() => {
+		// Resets selected player action
+		for (let i = 0; i < players.length; i += 1) {
+			pickAction(players[i], null);
+			movePlayerToMainMenu(players[i]);
+		}
+	}, 2000);
+}
+
+function startMatch(players: [User, User]) {
+	// Setup match timer
+	let remainingTime = matchDuration;
+	
+	const remainingTimeInterval = setInterval(() => {
+		for (let i = 0; i < players.length; i += 1) {
+			setRemainingTime(players[i], remainingTime);
 		}
 
-		// Update caller private tap state and store it in storage available to that client only
-		callerTaps[caller.id] += 1;
-		server.setData('your-taps', callerTaps[caller.id], caller.id);
+		remainingTime -= 1;
 
-		// Update user score in leaderboard
-		server.setScore(caller.id, callerTaps[caller.id]);
+		// Starts battle when timer runs to 0
+		if (remainingTime <= 0) {
+			clearInterval(remainingTimeInterval);
 
-		return true;
-	});
+			finalizeResults(players);
+		}
+	}, 1000);
+
+	// Start battle
+	movePlayerToBattle(players[0], players[1]);
+	movePlayerToBattle(players[1], players[0]);
+}
+
+export function initServer(server: Server) {
+	gameServer = server;
+
+	initPlayerStates(gameServer);
+
+	server.register('start-matchmaking', startMatching);
+	server.register('pick-action', pickAction);
+	
+	// TODO: Register another function that allows player to play against a bot
+
+	initMatchmaker(server, 2, startMatch);
 }
