@@ -141,7 +141,7 @@ function startBotMatch(player: User)
 
 function isBot(p: User)    // todo: would be better to check if playerStates[0] is 'bot-battle' but that breaks it (currently, adding a client called 'bot' creates a lot of weirdness)
 {
-	return p.id == 'bot';
+	return p.id === 'bot';
 }
 
 
