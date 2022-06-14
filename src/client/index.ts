@@ -37,13 +37,13 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			const opponent = client.getUsers()[state.opponent];
 			const opponentElement = gameContainer.querySelector('.opponent');
 
-			if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  // shouldn't be needed but it breaks otherwise
+			if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  
 			else opponentElement.textContent = opponent.name;
 			
 			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
 
-			if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);	// todo: allow random bot avatars to work
-			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/bottts/aaaaaaadd.svg?size=32";
+			if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
+			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/bottts/hhhhhhhhhhhhh.svg?size=40";
 
 			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 			yourAvatarElement.src = client.user.getAvatarUrl(32);
