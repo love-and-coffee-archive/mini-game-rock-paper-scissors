@@ -20,25 +20,82 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			gameContainer.querySelector('button').onclick = () => {
 				client.call('start-matchmaking');
 			}
+
+
+			gameContainer.querySelectorAll('button')[1].onclick = () => {
+				client.call('start-bot-match');
+			}
+			
+
 		} else if (state.phase === 'matchmaking') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = matchmakingHTML;
-		} else if (state.phase === 'battle') {
+		} else if (state.phase === 'battle' || state.phase === 'bot-battle') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = battleHTML;
 
 			const opponent = client.getUsers()[state.opponent];
-			
 			const opponentElement = gameContainer.querySelector('.opponent');
-			opponentElement.textContent = opponent.name;
+
+			if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  // shouldn't be needed but it breaks otherwise
+			else opponentElement.textContent = opponent.name;
 			
 			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
-			opponentAvatarElement.src = opponent.getAvatarUrl(32);
+			if (state.phase !== 'bot-battle') opponentAvatarElement.src = opponent.getAvatarUrl(32);	// todo
 			
 			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 			yourAvatarElement.src = client.user.getAvatarUrl(32);
 
-			// TODO: Add ability to select user action and display its state
+
+
+			// select user action and display its state
+
+			const rockElement = gameContainer.querySelector('.action-rock');
+			const paperElement = gameContainer.querySelector('.action-paper');
+			const scissorsElement = gameContainer.querySelector('.action-scissors');
+
+			const actionElements = [rockElement, paperElement, scissorsElement];
+
+			for (let i = 0; i < actionElements.length; i++)
+			{
+				actionElements[i].addEventListener('click', function()
+				{
+					for (let i = 0; i < actionElements.length; i++)
+						actionElements[i].classList.toggle('selected', false);	// reset all buttons first so multiple don't get visually selected
+
+					
+					// there is probably a much nicer way of doing this
+					switch (i)
+					{
+						case 0:
+							// rock
+							console.log("selected rock");
+							client.call('pick-action', 'rock');
+							rockElement.classList.toggle('selected', true);
+
+							return;
+						
+						case 1:
+							// paper
+							console.log("selected paper");
+							client.call('pick-action', 'paper');
+							paperElement.classList.toggle('selected', true);
+
+							return;
+
+						case 2:
+							// scissors
+							console.log("selected scissors");
+							client.call('pick-action', 'scissors');
+							scissorsElement.classList.toggle('selected', true);
+
+							return;
+					}
+				});
+			}			
+
+
+			//
 
 			timerElement = gameContainer.querySelector('.timer');
 		} else if (state.phase === 'results') {
@@ -47,6 +104,7 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			
 			const resultElement = gameContainer.querySelector('.result');
 			resultElement.textContent = state.result;
+
 		} else {
 			gameContainer.innerHTML = JSON.stringify(state);
 		}
@@ -60,8 +118,6 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		if (key === 'remaining-time' && phase === 'battle' && timerElement) {
 			timerElement.textContent = value;
 		}
-
-		// TODO: Display selected action based on 'selected-action' key 
 	});
 
 	renderState(client.getData('state'));
