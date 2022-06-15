@@ -4,8 +4,8 @@ import { initMatchmaker, startMatching } from './matchmaking';
 import { initPlayerStates, movePlayerToBattle,  movePlayerToBotBattle,  movePlayerToMainMenu, movePlayerToResults, playerStates } from './player-states';
 
 let gameServer: Server;
-
 const matchDuration = 5;
+
 type Action = 'rock' | 'paper' | 'scissors' | null;
 
 const playerSelectedAction: { [key: string]: Action } = {};
@@ -119,7 +119,6 @@ function startMatch(players: [User, User])
 	if (isBot(players[1]))   
 	{
 		movePlayerToBotBattle(players[0], players[1]);
-		// movePlayerToBotBattle(players[1], players[0]);
 	}
 
 	else

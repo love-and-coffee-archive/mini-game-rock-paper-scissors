@@ -21,10 +21,10 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 				client.call('start-matchmaking');
 			}
 
-
 			gameContainer.querySelectorAll('button')[1].onclick = () => {
 				client.call('start-bot-match');
 			}
+
 			
 
 		} else if (state.phase === 'matchmaking') {
@@ -117,7 +117,7 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			renderState(value);
 		}
 
-		if (key === 'remaining-time' && phase === 'battle' && timerElement) {
+		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) {
 			timerElement.textContent = value;
 		}
 	});
