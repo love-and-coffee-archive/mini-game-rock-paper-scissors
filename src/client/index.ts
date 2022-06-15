@@ -1,9 +1,10 @@
-import { Client } from '@love-and-coffee/mini-game-sdk';
+import { Client, Server } from '@love-and-coffee/mini-game-sdk';
 import './index.scss';
 import mainMenuHTML from './main-menu.html';
 import matchmakingHTML from './matchmaking.html';
 import battleHTML from './battle.html';
 import resultsHTML from './results.html';
+import { devServer } from '../../webpack.config';
 
 export async function initClient(gameContainer: HTMLElement, client: Client) {
 	let phase: string | null = null;
@@ -38,7 +39,58 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 			yourAvatarElement.src = client.user.getAvatarUrl(32);
 
-			// TODO: Add ability to select user action and display its state
+
+
+			// select user action and display its state
+			// todo: visual feedback for selections
+
+			const rockElement = gameContainer.querySelector('.action-rock');
+			const paperElement = gameContainer.querySelector('.action-paper');
+			const scissorsElement = gameContainer.querySelector('.action-scissors');
+
+			const actionElements = [rockElement, paperElement, scissorsElement];
+
+			for (let i = 0; i < actionElements.length; i++)
+			{
+				actionElements[i].addEventListener('click', function()
+				{
+					for (let i = 0; i < actionElements.length; i++)
+						actionElements[i].classList.toggle('selected', false);	// reset all buttons first so multiple don't get visually selected
+
+					
+					// there is probably a much nicer way of doing this
+					switch (i)
+					{
+						case 0:
+							// rock
+							console.log("selected rock");
+							client.call('pick-action', 'rock');
+							rockElement.classList.toggle('selected', true);
+
+							return;
+						
+						case 1:
+							// paper
+							console.log("selected paper");
+							client.call('pick-action', 'paper');
+							paperElement.classList.toggle('selected', true);
+
+							return;
+
+						case 2:
+							// scissors
+							console.log("selected scissors");
+							client.call('pick-action', 'scissors');
+							scissorsElement.classList.toggle('selected', true);
+
+							return;
+					}
+				});
+			}			
+
+
+
+			//
 
 			timerElement = gameContainer.querySelector('.timer');
 		} else if (state.phase === 'results') {
