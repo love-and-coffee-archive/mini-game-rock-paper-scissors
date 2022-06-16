@@ -100,20 +100,19 @@ function startMatch(players: [User, User])
 	let remainingTime = matchDuration;
 
 	const remainingTimeInterval = setInterval(() => {
+		remainingTime -= 1;
+
 		for (let i = 0; i < players.length; i += 1) {
 			setRemainingTime(players[i], remainingTime);
 		}
 
-		remainingTime -= 1;
-
 		// Starts battle when timer runs to 0
-		if (remainingTime <= 0) {
+		if (remainingTime < 0) {
 			clearInterval(remainingTimeInterval);
 
 			finalizeResults(players);
 		}
 	}, 1000);
-
 
 	// Start battle
 
@@ -121,11 +120,14 @@ function startMatch(players: [User, User])
 	{
 		movePlayerToBotBattle(players[0], players[1]);
 	}
-
 	else
 	{
 	 	movePlayerToBattle(players[0], players[1]);
 	 	movePlayerToBattle(players[1], players[0]);
+	}
+
+	for (let i = 0; i < players.length; i += 1) {
+		setRemainingTime(players[i], remainingTime);
 	}
 }
 
