@@ -16,20 +16,34 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		if (state.phase === 'main-menu') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = mainMenuHTML;
-			
-			gameContainer.querySelector('button').onclick = () => {
+
+			const playVsHumanButton = gameContainer.querySelector('.play-vs-human') as HTMLButtonElement;
+			const playVsBotButton = gameContainer.querySelector('.play-vs-bot') as HTMLButtonElement; 
+
+			playVsHumanButton.onclick = () => {
 				client.call('start-matchmaking');
 			}
 
-			gameContainer.querySelectorAll('button')[1].onclick = () => {
+
+			playVsBotButton.onclick = () => {
 				client.call('start-bot-match');
 			}
 
-			
+
 
 		} else if (state.phase === 'matchmaking') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = matchmakingHTML;
+
+
+			// allow the player to cancel matchmaking
+			const cancelButton = gameContainer.querySelector('.cancel-matchmaking') as HTMLButtonElement;
+
+			cancelButton.onclick = () => {
+				client.call('stop-matchmaking');
+			}
+
+
 		} else if (state.phase === 'battle' || state.phase === 'bot-battle') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = battleHTML;

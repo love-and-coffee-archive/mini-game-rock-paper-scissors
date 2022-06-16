@@ -2,6 +2,7 @@ import { Server, User } from '@love-and-coffee/mini-game-sdk';
 import { randomIntFromInterval } from './helpers';
 import { initMatchmaker, startMatching } from './matchmaking';
 import { initPlayerStates, movePlayerToBattle,  movePlayerToBotBattle,  movePlayerToMainMenu, movePlayerToResults, playerStates } from './player-states';
+import { stopMatching } from './matchmaking';
 
 let gameServer: Server;
 const matchDuration = 5;
@@ -138,7 +139,13 @@ function startBotMatch(player: User)
 }
 
 
-function isBot(p: User)    // todo: would be better to check if playerStates[0] is 'bot-battle' but that breaks it (currently, adding a client called 'bot' creates a lot of weirdness)
+function stopMatchMaking(player: User)
+{
+	stopMatching(player);
+}
+
+
+function isBot(p: User)
 {
 	return p.id === 'bot';
 }
@@ -192,6 +199,7 @@ export function initServer(server: Server)
 	server.register('start-matchmaking', startMatching);
 	server.register('pick-action', pickAction);
 	server.register('start-bot-match', startBotMatch)
+	server.register('stop-matchmaking', stopMatchMaking);
 
 	initMatchmaker(server, 2, startMatch);
 }
