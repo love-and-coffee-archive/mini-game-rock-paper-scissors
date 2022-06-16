@@ -5,6 +5,7 @@ import matchmakingHTML from './matchmaking.html';
 import battleHTML from './battle.html';
 import resultsHTML from './results.html';
 import { devServer } from '../../webpack.config';
+import { randomIntFromInterval } from '../server/helpers';
 
 export async function initClient(gameContainer: HTMLElement, client: Client) {
 	let phase: string | null = null;
@@ -58,7 +59,7 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
 
 			if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
-			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/bottts/hhhhhhhhhhhhh.svg?size=40";
+			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/pixel-art-neutral/" + randomIntFromInterval(0, 1000) + ".svg?size=150&scale=70";
 
 			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 			yourAvatarElement.src = client.user.getAvatarUrl(32);
@@ -120,6 +121,11 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			
 			const resultElement = gameContainer.querySelector('.result');
 			resultElement.textContent = state.result;
+
+			if (state.result === 'won') {
+				const pointsElement = gameContainer.querySelector('.points');
+				pointsElement.textContent = '+1';
+			}
 
 		} else {
 			gameContainer.innerHTML = JSON.stringify(state);
