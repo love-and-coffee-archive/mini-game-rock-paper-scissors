@@ -17,32 +17,55 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		if (state.phase === 'main-menu') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = mainMenuHTML;
-			
-			gameContainer.querySelector('button').onclick = () => {
+
+			const playVsHumanButton = gameContainer.querySelector('.play-vs-human') as HTMLButtonElement;
+			const playVsBotButton = gameContainer.querySelector('.play-vs-bot') as HTMLButtonElement; 
+
+			playVsHumanButton.onclick = () => {
 				client.call('start-matchmaking');
 			}
+
+
+			playVsBotButton.onclick = () => {
+				client.call('start-bot-match');
+			}
+
+
+
 		} else if (state.phase === 'matchmaking') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = matchmakingHTML;
-		} else if (state.phase === 'battle') {
+
+
+			// allow the player to cancel matchmaking
+			const cancelButton = gameContainer.querySelector('.cancel-matchmaking') as HTMLButtonElement;
+
+			cancelButton.onclick = () => {
+				client.call('stop-matchmaking');
+			}
+
+
+		} else if (state.phase === 'battle' || state.phase === 'bot-battle') {
 			// TODO: Make this screen look nice
 			gameContainer.innerHTML = battleHTML;
 
 			const opponent = client.getUsers()[state.opponent];
-			
 			const opponentElement = gameContainer.querySelector('.opponent');
-			opponentElement.textContent = opponent.name;
+
+			if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  
+			else opponentElement.textContent = opponent.name;
 			
 			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
-			opponentAvatarElement.src = opponent.getAvatarUrl(32);
-			
+
+			if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
+			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/bottts/hhhhhhhhhhhhh.svg?size=40";
+
 			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 			yourAvatarElement.src = client.user.getAvatarUrl(32);
 
 
 
 			// select user action and display its state
-			// todo: visual feedback for selections
 
 			const rockElement = gameContainer.querySelector('.action-rock');
 			const paperElement = gameContainer.querySelector('.action-paper');
@@ -88,8 +111,6 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 				});
 			}			
 
-
-
 			//
 
 			timerElement = gameContainer.querySelector('.timer');
@@ -99,6 +120,7 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			
 			const resultElement = gameContainer.querySelector('.result');
 			resultElement.textContent = state.result;
+
 		} else {
 			gameContainer.innerHTML = JSON.stringify(state);
 		}
@@ -109,11 +131,9 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			renderState(value);
 		}
 
-		if (key === 'remaining-time' && phase === 'battle' && timerElement) {
+		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) {
 			timerElement.textContent = value;
 		}
-
-		// TODO: Display selected action based on 'selected-action' key 
 	});
 
 	renderState(client.getData('state'));

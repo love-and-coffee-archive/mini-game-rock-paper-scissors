@@ -1,6 +1,6 @@
 import { Server, User } from '@love-and-coffee/mini-game-sdk';
 
-type Phase = 'main-menu' | 'matchmaking' | 'battle' | 'results';
+type Phase = 'main-menu' | 'matchmaking' | 'battle' | 'bot-battle' | 'results';
 type Result = 'won' | 'lost' | 'tie';
 
 type State = {
@@ -62,6 +62,15 @@ export function movePlayerToBattle(player: User, opponent: User) {
 	playerStates[player.id].opponent = opponent.id;
 	playerStates[player.id].result = null;
 	
+	syncPlayerState(player);
+}
+
+export function movePlayerToBotBattle(player: User, bot: User)
+{
+	playerStates[player.id].phase = 'bot-battle';
+	playerStates[player.id].opponent = bot.id;
+	playerStates[player.id].result = null;
+
 	syncPlayerState(player);
 }
 

@@ -1,5 +1,5 @@
 import { Server, User } from '@love-and-coffee/mini-game-sdk';
-import { movePlayerToMatchmaking, playerStates } from './player-states';
+import { movePlayerToMainMenu, movePlayerToMatchmaking, playerStates } from './player-states';
 
 let gameServer: Server;
 let numberOfPlayersToMatch = 2;
@@ -31,6 +31,17 @@ export function startMatching(user: User) {
 	usersReadyToMatch.push(user);
 
 	tryToStartMatch();
+}
+
+export function stopMatching(user: User)
+{
+	console.log(user.name + " cancelled matchmaking");
+	movePlayerToMainMenu(user);
+
+	usersReadyToMatch = usersReadyToMatch.filter(function(player, index, arr) 
+	{
+		return player.id != user.id;
+	});
 }
 
 export function initMatchmaker(server: Server, minPlayers: number, startMatchCallback: (players: User[]) => void) {
