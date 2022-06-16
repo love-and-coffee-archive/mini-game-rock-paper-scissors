@@ -1,9 +1,10 @@
-import { Client } from '@love-and-coffee/mini-game-sdk';
+import { Client, Server } from '@love-and-coffee/mini-game-sdk';
 import './index.scss';
 import mainMenuHTML from './main-menu.html';
 import matchmakingHTML from './matchmaking.html';
 import battleHTML from './battle.html';
 import resultsHTML from './results.html';
+import { devServer } from '../../webpack.config';
 
 export async function initClient(gameContainer: HTMLElement, client: Client) {
 	let phase: string | null = null;
@@ -109,7 +110,6 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 					}
 				});
 			}			
-
 
 			//
 

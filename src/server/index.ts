@@ -1,4 +1,5 @@
 import { Server, User } from '@love-and-coffee/mini-game-sdk';
+import { debug } from 'webpack';
 import { randomIntFromInterval } from './helpers';
 import { initMatchmaker, startMatching } from './matchmaking';
 import { initPlayerStates, movePlayerToBattle,  movePlayerToBotBattle,  movePlayerToMainMenu, movePlayerToResults, playerStates } from './player-states';
@@ -10,7 +11,6 @@ const matchDuration = 5;
 type Action = 'rock' | 'paper' | 'scissors' | null;
 
 const playerSelectedAction: { [key: string]: Action } = {};
-
 
 let botUser = new User('bot', 'bot', null, true);
 
@@ -44,7 +44,7 @@ function finalizeResults(players: User[])
 
 	let playerWhoWon;
 	const result = determineWinner(players, playerSelectedAction[players[0].id], playerSelectedAction[players[1].id]);
-
+  
 	if (result === 'tie')
 	{
 		// reset actions and do another round
