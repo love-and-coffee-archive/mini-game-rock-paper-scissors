@@ -13,9 +13,54 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 	function renderState(state: any) {
 		phase = state.phase;
 
+
+		// TODO: Make these screens look nice
 		if (state.phase === 'main-menu') {
-			// TODO: Make this screen look nice
-			gameContainer.innerHTML = mainMenuHTML;
+			StartMainMenuPhase();
+
+
+		} else if (state.phase === 'matchmaking') {
+			StartMatchmakingPhase();
+
+
+		} else if (state.phase === 'battle' || state.phase === 'bot-battle') {
+			StartBattlePhase(state);	
+
+
+		} else if (state.phase === 'results') {
+			StartResultsPhase(state);
+			
+
+		} else {
+			gameContainer.innerHTML = JSON.stringify(state);
+		}
+	}
+	
+	const clearSetDataListener = client.emitter.on('setData', (key: string, value: any) => {
+		if (key === 'state') {
+			renderState(value);
+		}
+
+		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) {
+			timerElement.textContent = value;
+		}
+	});
+
+	renderState(client.getData('state'));
+
+	// Minigame destroy function
+	return () => {
+		clearSetDataListener();
+	}
+
+
+
+
+//---PHASE-FUNCTIONS---//
+
+	function StartMainMenuPhase()
+	{
+		gameContainer.innerHTML = mainMenuHTML;
 
 			const playVsHumanButton = gameContainer.querySelector('.play-vs-human') as HTMLButtonElement;
 			const playVsBotButton = gameContainer.querySelector('.play-vs-bot') as HTMLButtonElement; 
@@ -28,12 +73,13 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			playVsBotButton.onclick = () => {
 				client.call('start-bot-match');
 			}
+	}
 
 
 
-		} else if (state.phase === 'matchmaking') {
-			// TODO: Make this screen look nice
-			gameContainer.innerHTML = matchmakingHTML;
+	function StartMatchmakingPhase()
+	{
+		gameContainer.innerHTML = matchmakingHTML;
 
 
 			// allow the player to cancel matchmaking
@@ -42,11 +88,13 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			cancelButton.onclick = () => {
 				client.call('stop-matchmaking');
 			}
+	}
 
 
-		} else if (state.phase === 'battle' || state.phase === 'bot-battle') {
-			// TODO: Make this screen look nice
-			gameContainer.innerHTML = battleHTML;
+
+	function StartBattlePhase(state: any)
+	{
+		gameContainer.innerHTML = battleHTML;
 
 			const opponent = client.getUsers()[state.opponent];
 			const opponentElement = gameContainer.querySelector('.opponent');
@@ -114,32 +162,15 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			//
 
 			timerElement = gameContainer.querySelector('.timer');
-		} else if (state.phase === 'results') {
-			// TODO: Make this screen look nice
-			gameContainer.innerHTML = resultsHTML;
+	}
+
+	
+
+	function StartResultsPhase(state: any)
+	{
+		gameContainer.innerHTML = resultsHTML;
 			
 			const resultElement = gameContainer.querySelector('.result');
 			resultElement.textContent = state.result;
-
-		} else {
-			gameContainer.innerHTML = JSON.stringify(state);
-		}
-	}
-	
-	const clearSetDataListener = client.emitter.on('setData', (key: string, value: any) => {
-		if (key === 'state') {
-			renderState(value);
-		}
-
-		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) {
-			timerElement.textContent = value;
-		}
-	});
-
-	renderState(client.getData('state'));
-
-	// Minigame destroy function
-	return () => {
-		clearSetDataListener();
 	}
 }
