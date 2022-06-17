@@ -50,35 +50,30 @@ function createPlayerStateIfOneDoesntExistYet(user: User)
 export function movePlayerToMainMenu(player: User) 
 {
 	updateState(player, 'main-menu');
-	syncPlayerState(player);
 }
 
 
 export function movePlayerToMatchmaking(player: User) 
 {
 	updateState(player, 'matchmaking')
-	syncPlayerState(player);
 }
 
 
 export function movePlayerToBattle(player: User, opponent: User) 
 {
 	updateState(player, 'battle', opponent.id);
-	syncPlayerState(player);
 }
 
 
 export function movePlayerToBotBattle(player: User, bot: User)
 {
 	updateState(player, 'bot-battle', bot.id)
-	syncPlayerState(player);
 }
 
 
 export function movePlayerToResults(player: User, opponent: User, result: Result) 
 {
 	updateState(player, 'results', opponent.id, result);
-	syncPlayerState(player);
 }
 
 
@@ -96,4 +91,6 @@ function updateState(player: User, phase: Phase, opponent: string = null, result
 	playerStates[player.id].phase = phase;
 	playerStates[player.id].opponent = opponent;
 	playerStates[player.id].result = result;
+
+	syncPlayerState(player);
 }
