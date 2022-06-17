@@ -1,5 +1,4 @@
 import { Server, User } from '@love-and-coffee/mini-game-sdk';
-import { debug } from 'webpack';
 import { randomIntFromInterval } from './helpers';
 import { initMatchmaker, startMatching } from './matchmaking';
 import { initPlayerStates, movePlayerToBattle,  movePlayerToBotBattle,  movePlayerToMainMenu, movePlayerToResults, playerStates } from './player-states';
@@ -35,11 +34,16 @@ function finalizeResults(players: User[])
 	// if a player hasn't picked an action pick a random one for them
 	const actions = ['rock', 'paper', 'scissors'] as Action[]
 
-	// TODO: Don't use single line conditions/commands/comments - they are very long (left -> right)
-	// and it's much easier to read and understand if curly brackets are used (top -> down)
-	// This TODO applies to the whole project - would be a nice clean up imo :)
-	if (playerSelectedAction[players[0].id] == null)    pickAction(players[0], actions[randomIntFromInterval(0, actions.length - 1)]);	// for bot matches, the bot's selection will
-	if (playerSelectedAction[players[1].id] == null)    pickAction(players[1], actions[randomIntFromInterval(0, actions.length - 1)]);  // always be empty here
+
+	if (playerSelectedAction[players[0].id] == null)
+	{
+		pickAction(players[0], actions[randomIntFromInterval(0, actions.length - 1)]);
+	}
+
+	if (playerSelectedAction[players[1].id] == null)
+	{
+		pickAction(players[1], actions[randomIntFromInterval(0, actions.length - 1)]);
+	}
 
 
 	console.log(playerSelectedAction[players[0].id] + "  ///  " + playerSelectedAction[players[1].id]);
@@ -76,20 +80,32 @@ function finalizeResults(players: User[])
 		playerWhoWon = result;
 		console.log(playerWhoWon.name + " won");
 
-		if (!isBot(playerWhoWon))  gameServer.setScore(playerWhoWon.id, gameServer.getScore(playerWhoWon.id) + 5);
+		if (!isBot(playerWhoWon))  
+		{
+			gameServer.setScore(playerWhoWon.id, gameServer.getScore(playerWhoWon.id) + 5);
+		}
 
 
 		movePlayerToResults(players[0], players[1], playerWhoWon.id === players[0].id ? 'won' : 'lost');
-		if (!isBot(players[1]))  movePlayerToResults(players[1], players[0], playerWhoWon.id === players[1].id ? 'won' : 'lost');
+
+		if (!isBot(players[1]))  
+		{
+			movePlayerToResults(players[1], players[0], playerWhoWon.id === players[1].id ? 'won' : 'lost');
+		}
 
 
 		// Short delay to show vistory/loss animation before we reset player states
 		setTimeout(() => {
 			// Resets selected player action
-			for (let i = 0; i < players.length; i += 1) {
+			for (let i = 0; i < players.length; i += 1) 
+			{
 
 				pickAction(players[i], null);
-				if (!isBot(players[i]))  movePlayerToMainMenu(players[i]);
+
+				if (!isBot(players[i]))  
+				{
+					movePlayerToMainMenu(players[i]);
+				}
 
 			}
 		}, 2000);
@@ -106,12 +122,14 @@ function startMatch(players: [User, User])
 	const remainingTimeInterval = setInterval(() => {
 		remainingTime -= 1;
 
-		for (let i = 0; i < players.length; i += 1) {
+		for (let i = 0; i < players.length; i += 1) 
+		{
 			setRemainingTime(players[i], remainingTime);
 		}
 
 		// Starts battle when timer runs to 0
-		if (remainingTime < 0) {
+		if (remainingTime < 0) 
+		{
 			clearInterval(remainingTimeInterval);
 
 			finalizeResults(players);
@@ -124,6 +142,7 @@ function startMatch(players: [User, User])
 	{
 		movePlayerToBotBattle(players[0], players[1]);
 	}
+
 	else
 	{
 	 	movePlayerToBattle(players[0], players[1]);
@@ -159,19 +178,23 @@ function isBot(p: User)
 
 function determineWinner(players: User[], action1: Action, action2: Action)
 {
-	if (action1 === action2) {
+	if (action1 === action2) 
+	{
 		return 'tie'
 	}
 
-	if (action1 === 'rock') {
+	if (action1 === 'rock') 
+	{
 		return action2 === 'scissors' ? players[0] : players[1];
 	}
 
-	if (action1 === 'paper') {
+	if (action1 === 'paper') 
+	{
 		return action2 === 'rock' ? players[0] : players[1];
 	}
 
-	if (action1 === 'scissors') {
+	if (action1 === 'scissors') 
+	{
 		return action2 === 'paper' ? players[0] : players[1];
 	}
 

@@ -14,7 +14,8 @@ let gameServer: Server;
 
 export const playerStates: { [key: string]: State } = {};
 
-export function initPlayerStates(server: Server) {
+export function initPlayerStates(server: Server) 
+{
 	gameServer = server;
 
 	gameServer.emitter.on('userConnected', (user: User) => {
@@ -23,13 +24,16 @@ export function initPlayerStates(server: Server) {
 
 	const alreadyConnectedUsers = Object.values(gameServer.getUsers());
 
-	for (let i = 0; i < alreadyConnectedUsers.length; i += 1) {
+	for (let i = 0; i < alreadyConnectedUsers.length; i += 1) 
+	{
 		createPlayerStateIfOneDoesntExistYet(alreadyConnectedUsers[i]);
 	}
 }
 
-function createPlayerStateIfOneDoesntExistYet(user: User) {
-	if (playerStates[user.id] == null) {
+function createPlayerStateIfOneDoesntExistYet(user: User) 
+{
+	if (playerStates[user.id] == null) 
+	{
 		playerStates[user.id] = {
 			user: user,
 			phase: 'main-menu',
@@ -40,49 +44,38 @@ function createPlayerStateIfOneDoesntExistYet(user: User) {
 		syncPlayerState(user);
 	}
 }
-// TODO: Create updateState(phase: Phase, opponent: string = null, result: string = null) function
-// that's called in every of these movePlayer.... functions replacing all of it's content with updateState
-// e.g. updateState('main-menu') or updateState('battle', opponent.id) etc...
-export function movePlayerToMainMenu(player: User) {
-	playerStates[player.id].phase = 'main-menu';
-	playerStates[player.id].opponent = null;
-	playerStates[player.id].result = null;
-	
-	syncPlayerState(player);
+
+
+
+export function movePlayerToMainMenu(player: User) 
+{
+	updateState(player, 'main-menu');
 }
 
-export function movePlayerToMatchmaking(player: User) {
-	playerStates[player.id].phase = 'matchmaking';
-	playerStates[player.id].opponent = null;
-	playerStates[player.id].result = null;
-	
-	syncPlayerState(player);
+
+export function movePlayerToMatchmaking(player: User) 
+{
+	updateState(player, 'matchmaking')
 }
 
-export function movePlayerToBattle(player: User, opponent: User) {
-	playerStates[player.id].phase = 'battle';
-	playerStates[player.id].opponent = opponent.id;
-	playerStates[player.id].result = null;
-	
-	syncPlayerState(player);
+
+export function movePlayerToBattle(player: User, opponent: User) 
+{
+	updateState(player, 'battle', opponent.id);
 }
+
 
 export function movePlayerToBotBattle(player: User, bot: User)
 {
-	playerStates[player.id].phase = 'bot-battle';
-	playerStates[player.id].opponent = bot.id;
-	playerStates[player.id].result = null;
-
-	syncPlayerState(player);
+	updateState(player, 'bot-battle', bot.id)
 }
 
-export function movePlayerToResults(player: User, opponent: User, result: Result) {
-	playerStates[player.id].phase = 'results';
-	playerStates[player.id].opponent = opponent.id;
-	playerStates[player.id].result = result;
-	
-	syncPlayerState(player);
+
+export function movePlayerToResults(player: User, opponent: User, result: Result) 
+{
+	updateState(player, 'results', opponent.id, result);
 }
+
 
 function syncPlayerState(player: User) {
 	gameServer.setPrivateData(player.id, 'state', {
@@ -90,4 +83,14 @@ function syncPlayerState(player: User) {
 		opponent: playerStates[player.id].opponent,
 		result: playerStates[player.id].result,
 	});
+}
+
+
+function updateState(player: User, phase: Phase, opponent: string = null, result: Result = null)
+{
+	playerStates[player.id].phase = phase;
+	playerStates[player.id].opponent = opponent;
+	playerStates[player.id].result = result;
+
+	syncPlayerState(player);
 }
