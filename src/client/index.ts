@@ -48,6 +48,10 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 
 	renderState(client.getData('state'));
 
+	// TODO: return statement should be the last thing in the function
+	// because some might not be aware that code below it won't execute
+	// but function declarations would still work.
+
 	// Minigame destroy function
 	return () => {
 		clearSetDataListener();
@@ -69,7 +73,6 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 			client.call('start-matchmaking');
 		}
 
-
 		playVsBotButton.onclick = () => {
 			client.call('start-bot-match');
 		}
@@ -81,13 +84,12 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 	{
 		gameContainer.innerHTML = matchmakingHTML;
 
+		// allow the player to cancel matchmaking
+		const cancelButton = gameContainer.querySelector('.cancel-matchmaking') as HTMLButtonElement;
 
-			// allow the player to cancel matchmaking
-			const cancelButton = gameContainer.querySelector('.cancel-matchmaking') as HTMLButtonElement;
-
-			cancelButton.onclick = () => {
-				client.call('stop-matchmaking');
-			}
+		cancelButton.onclick = () => {
+			client.call('stop-matchmaking');
+		}
 	}
 
 
@@ -96,71 +98,58 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 	{
 		gameContainer.innerHTML = battleHTML;
 
-			const opponent = client.getUsers()[state.opponent];
-			const opponentElement = gameContainer.querySelector('.opponent');
+		const opponent = client.getUsers()[state.opponent];
+		const opponentElement = gameContainer.querySelector('.opponent');
 
-			if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  
-			else opponentElement.textContent = opponent.name;
-			
-			const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
+		if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  
+		else opponentElement.textContent = opponent.name;
+		
+		const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
 
-			if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
-			else opponentAvatarElement.src = "https://avatars.dicebear.com/api/pixel-art-neutral/" + randomIntFromInterval(0, 1000) + ".svg?size=150&scale=70";
+		if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
+		else opponentAvatarElement.src = "https://avatars.dicebear.com/api/pixel-art-neutral/" + randomIntFromInterval(0, 1000) + ".svg?size=150&scale=70";
 
-			const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
-			yourAvatarElement.src = client.user.getAvatarUrl(32);
+		const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
+		yourAvatarElement.src = client.user.getAvatarUrl(32);
 
 
 
-			// select user action and display its state
+		// select user action and display its state
 
-			const rockElement = gameContainer.querySelector('.action-rock');
-			const paperElement = gameContainer.querySelector('.action-paper');
-			const scissorsElement = gameContainer.querySelector('.action-scissors');
-
-			const actionElements = [rockElement, paperElement, scissorsElement];
-
-			for (let i = 0; i < actionElements.length; i++)
+		const actions = [
 			{
-				actionElements[i].addEventListener('click', function()
-				{
-					for (let i = 0; i < actionElements.length; i++)
-						actionElements[i].classList.toggle('selected', false);	// reset all buttons first so multiple don't get visually selected
+				element: gameContainer.querySelector('.action-rock'),
+				action: 'rock',
+			},
+			{
+				element: gameContainer.querySelector('.action-paper'),
+				action: 'paper',
+			},
+			{
+				element: gameContainer.querySelector('.action-scissors'),
+				action: 'scissors',
+			},
+		];
 
-					
-					// there is probably a much nicer way of doing this
-					switch (i)
-					{
-						case 0:
-							// rock
-							console.log("selected rock");
-							client.call('pick-action', 'rock');
-							rockElement.classList.toggle('selected', true);
+		for (let i = 0; i < actions.length; i++)
+		{
+			const element = actions[i].element;
+			const selectedAction = actions[i].action;
 
-							return;
-						
-						case 1:
-							// paper
-							console.log("selected paper");
-							client.call('pick-action', 'paper');
-							paperElement.classList.toggle('selected', true);
+			element.addEventListener('click', () => {
+				for (let j = 0; j < actions.length; j++) {
+					const singleAction = actions[j];
+					singleAction.element.classList.toggle('selected', singleAction.action === selectedAction);
+				}
 
-							return;
+				console.log("selected " + selectedAction);
+				client.call('pick-action', selectedAction);
+			});
+		}			
 
-						case 2:
-							// scissors
-							console.log("selected scissors");
-							client.call('pick-action', 'scissors');
-							scissorsElement.classList.toggle('selected', true);
+		//
 
-							return;
-					}
-				});
-			}			
-
-			//
-
-			timerElement = gameContainer.querySelector('.timer');
+		timerElement = gameContainer.querySelector('.timer');
 	}
 
 
@@ -169,19 +158,19 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 	{
 		gameContainer.innerHTML = resultsHTML;
 			
-			const resultElement = gameContainer.querySelector('.result');
-			const pointsElement = gameContainer.querySelector('.points');
+		const resultElement = gameContainer.querySelector('.result');
+		const pointsElement = gameContainer.querySelector('.points');
 
-			resultElement.textContent = state.result;
+		resultElement.textContent = state.result;
 
 
-			if (state.result === 'won') {
-				pointsElement.textContent = '+5';
-			}
+		if (state.result === 'won') {
+			pointsElement.textContent = '+5';
+		}
 
-			else if (state.result === 'tie')
-			{
-				pointsElement.textContent = "+1";
-			}
+		else if (state.result === 'tie')
+		{
+			pointsElement.textContent = "+1";
+		}
 	}
 }
