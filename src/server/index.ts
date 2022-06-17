@@ -58,6 +58,7 @@ function finalizeResults(players: User[])
 
 			for (let i = 0; i < players.length; i++)
 			{
+				if (!isBot(players[i]))   gameServer.setScore(players[i].id, gameServer.getScore(players[i].id) + 1);
 				pickAction(players[i], null);
 			}
 
@@ -72,7 +73,7 @@ function finalizeResults(players: User[])
 		playerWhoWon = result;
 		console.log(playerWhoWon.name + " won");
 
-		if (!isBot(playerWhoWon))  gameServer.setScore(playerWhoWon.id, gameServer.getScore(playerWhoWon.id) + 1);
+		if (!isBot(playerWhoWon))  gameServer.setScore(playerWhoWon.id, gameServer.getScore(playerWhoWon.id) + 5);
 
 
 		movePlayerToResults(players[0], players[1], playerWhoWon.id === players[0].id ? 'won' : 'lost');
