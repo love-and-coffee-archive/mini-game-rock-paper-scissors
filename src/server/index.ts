@@ -35,6 +35,9 @@ function finalizeResults(players: User[])
 	// if a player hasn't picked an action pick a random one for them
 	const actions = ['rock', 'paper', 'scissors'] as Action[]
 
+	// TODO: Don't use single line conditions/commands/comments - they are very long (left -> right)
+	// and it's much easier to read and understand if curly brackets are used (top -> down)
+	// This TODO applies to the whole project - would be a nice clean up imo :)
 	if (playerSelectedAction[players[0].id] == null)    pickAction(players[0], actions[randomIntFromInterval(0, actions.length - 1)]);	// for bot matches, the bot's selection will
 	if (playerSelectedAction[players[1].id] == null)    pickAction(players[1], actions[randomIntFromInterval(0, actions.length - 1)]);  // always be empty here
 
@@ -156,39 +159,23 @@ function isBot(p: User)
 
 function determineWinner(players: User[], action1: Action, action2: Action)
 {
-	if (action1 === action2) return 'tie';
-
-	else
-	{
-		if (action1 === 'rock')
-		{
-			if (action2 === 'scissors') return players[0];
-
-			return players[1];
-		}
-
-		else if (action1 === 'paper')
-		{
-			if (action2 === 'rock') return players[0];
-
-			return players[1];
-		}
-
-		else if (action1 === 'scissors')
-		{
-			if (action2 === 'paper') return players[0];
-
-			return players[1];
-		}
-
-
-		else
-		{
-			console.log('something went wrong in determineWinner(), defaulting to a tie');
-		}
+	if (action1 === action2) {
+		return 'tie'
 	}
 
+	if (action1 === 'rock') {
+		return action2 === 'scissors' ? players[0] : players[1];
+	}
 
+	if (action1 === 'paper') {
+		return action2 === 'rock' ? players[0] : players[1];
+	}
+
+	if (action1 === 'scissors') {
+		return action2 === 'paper' ? players[0] : players[1];
+	}
+
+	console.log('something went wrong in determineWinner(), defaulting to a tie');
 	return 'tie';
 }
 

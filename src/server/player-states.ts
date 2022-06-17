@@ -40,7 +40,9 @@ function createPlayerStateIfOneDoesntExistYet(user: User) {
 		syncPlayerState(user);
 	}
 }
-
+// TODO: Create updateState(phase: Phase, opponent: string = null, result: string = null) function
+// that's called in every of these movePlayer.... functions replacing all of it's content with updateState
+// e.g. updateState('main-menu') or updateState('battle', opponent.id) etc...
 export function movePlayerToMainMenu(player: User) {
 	playerStates[player.id].phase = 'main-menu';
 	playerStates[player.id].opponent = null;
