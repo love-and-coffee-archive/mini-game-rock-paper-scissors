@@ -4,14 +4,12 @@ import mainMenuHTML from './main-menu.html';
 import matchmakingHTML from './matchmaking.html';
 import battleHTML from './battle.html';
 import resultsHTML from './results.html';
-import { devServer } from '../../webpack.config';
 import { randomIntFromInterval } from '../server/helpers';
 
 export async function initClient(gameContainer: HTMLElement, client: Client) {
 	let phase: string | null = null;
 	let timerElement: HTMLElement;
 
-	// TODO: Split logic in smaller functions
 	function renderState(state: any) {
 		phase = state.phase;
 
@@ -28,7 +26,7 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 
 		} else if (state.phase === 'results') {
 			StartResultsPhase(state);
-			
+
 
 		} else {
 			gameContainer.innerHTML = JSON.stringify(state);
@@ -37,25 +35,20 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 	
 	
 	const clearSetDataListener = client.emitter.on('setData', (key: string, value: any) => {
-		if (key === 'state') {
+		if (key === 'state') 
+		{
 			renderState(value);
 		}
 
-		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) {
+		if (key === 'remaining-time' && (phase === 'battle' || phase === 'bot-battle') && timerElement) 
+		{
 			timerElement.textContent = value;
 		}
 	});
 
 	renderState(client.getData('state'));
+	
 
-	// TODO: return statement should be the last thing in the function
-	// because some might not be aware that code below it won't execute
-	// but function declarations would still work.
-
-	// Minigame destroy function
-	return () => {
-		clearSetDataListener();
-	}
 
 
 
@@ -101,13 +94,28 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		const opponent = client.getUsers()[state.opponent];
 		const opponentElement = gameContainer.querySelector('.opponent');
 
-		if (state.phase === 'bot-battle') opponentElement.textContent = 'bot';  
-		else opponentElement.textContent = opponent.name;
+		if (state.phase === 'bot-battle') 
+		{
+			opponentElement.textContent = 'bot';  
+		}
+
+		else 
+		{
+			opponentElement.textContent = opponent.name;
+		}
 		
 		const opponentAvatarElement = gameContainer.querySelector('.opponent-avatar') as HTMLImageElement;
+		
 
-		if (state.phase !== 'bot-battle')  opponentAvatarElement.src = opponent.getAvatarUrl(32);
-		else opponentAvatarElement.src = "https://avatars.dicebear.com/api/pixel-art-neutral/" + randomIntFromInterval(0, 1000) + ".svg?size=150&scale=70";
+		if (state.phase !== 'bot-battle')  
+		{
+			opponentAvatarElement.src = opponent.getAvatarUrl(32);
+		}
+
+		else 
+		{
+			opponentAvatarElement.src = "https://avatars.dicebear.com/api/pixel-art-neutral/" + randomIntFromInterval(0, 1000) + ".svg?size=150&scale=70";
+		}
 
 		const yourAvatarElement = gameContainer.querySelector('.your-avatar') as HTMLImageElement;
 		yourAvatarElement.src = client.user.getAvatarUrl(32);
@@ -164,7 +172,8 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		resultElement.textContent = state.result;
 
 
-		if (state.result === 'won') {
+		if (state.result === 'won') 
+		{
 			pointsElement.textContent = '+5';
 		}
 
@@ -172,5 +181,11 @@ export async function initClient(gameContainer: HTMLElement, client: Client) {
 		{
 			pointsElement.textContent = "+1";
 		}
+	}
+
+
+	// Minigame destroy function
+	return () => {
+		clearSetDataListener();
 	}
 }
